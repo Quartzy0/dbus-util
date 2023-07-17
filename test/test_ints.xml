@@ -1,0 +1,20 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+        "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/">
+    <interface name="me.quartzy.dbusutil.testints">
+        <method name="Test">
+            <arg name="Byte" type="y" direction="in"/>
+            <arg name="Bool" type="b" direction="in"/>
+            <arg name="int16" type="n" direction="in"/>
+            <arg name="uint16" type="q" direction="in"/>
+            <arg name="int32" type="i" direction="in"/>
+            <arg name="uint32" type="u" direction="in"/>
+            <arg name="int64" type="x" direction="in"/>
+            <arg name="uint64" type="t" direction="in"/>
+            <arg name="double" type="d" direction="in"/>
+            <arg name="unix_fd" type="h" direction="in"/>
+            <arg name="int32 out" type="i" direction="out"/>
+            <arg name="uint32 out" type="u" direction="out"/>
+        </method>
+    </interface>
+</node>

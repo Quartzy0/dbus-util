@@ -1,0 +1,12 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+        "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/">
+    <interface name="me.quartzy.dbusutil.testproperties">
+        <property name="Prop_int" type="i" access="readwrite"/>
+        <property name="Prop_int1" type="u" access="readwrite"/>
+        <property name="Prop_str" type="s" access="readwrite"/>
+        <property name="Prop_complex" type="(os)" access="readwrite"/>
+        <property name="Prop_bool" type="b" access="read"/>
+        <method name="AllRead"/>
+    </interface>
+</node>

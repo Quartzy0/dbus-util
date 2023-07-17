@@ -1,0 +1,17 @@
+add_executable(dbus_util_test_ints test_ints.c)
+target_link_libraries(dbus_util_test_ints PRIVATE dbus_util)
+add_test(NAME test_ints COMMAND dbus_util_test_ints)
+
+add_executable(dbus_util_test_str test_str.c)
+target_link_libraries(dbus_util_test_str PRIVATE dbus_util)
+add_test(NAME test_str COMMAND dbus_util_test_str)
+
+add_executable(dbus_util_test_containers test_containers.c)
+target_link_libraries(dbus_util_test_containers PRIVATE dbus_util)
+add_test(NAME test_containers COMMAND dbus_util_test_containers)
+
+add_executable(dbus_util_test_properties test_properties.c)
+target_link_libraries(dbus_util_test_properties PRIVATE dbus_util)
+add_test(NAME test_properties COMMAND dbus_util_test_properties)
+
+set_tests_properties(test_ints test_str test_containers test_properties PROPERTIES TIMEOUT 5 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)

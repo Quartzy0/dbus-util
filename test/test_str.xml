@@ -1,0 +1,12 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+        "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/">
+    <interface name="me.quartzy.dbusutil.teststr">
+        <method name="Test">
+            <arg name="String" type="s" direction="in"/>
+            <arg name="Object" type="o" direction="in"/>
+            <arg name="StringOut" type="s" direction="out"/>
+            <arg name="ObjectOut" type="o" direction="out"/>
+        </method>
+    </interface>
+</node>

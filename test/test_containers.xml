@@ -1,0 +1,13 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+        "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/">
+    <interface name="me.quartzy.dbusutil.testcontainers">
+        <method name="Test">
+            <arg name="Array" type="ai" direction="in"/>
+            <arg name="Struct" type="(ii)" direction="in"/>
+            <arg name="Dict" type="a{si}" direction="in"/>
+            <arg name="Variant" type="v" direction="out"/>
+            <arg name="Variant2" type="v" direction="out"/>
+        </method>
+    </interface>
+</node>
