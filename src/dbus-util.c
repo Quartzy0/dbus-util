@@ -1298,6 +1298,24 @@ dbus_util_message_context_free(dbus_message_context *ctx) {
     free(ctx);
 }
 
+uint32_t
+dbus_util_get_serial(dbus_method_call *call){
+    if (!call) return -1;
+    return call->serial;
+}
+
+void
+dbus_util_set_reply_serial(dbus_method_call *call, uint32_t serial) {
+    if (!call) return;
+    if (call->reply){
+        dbus_message_set_reply_serial(call->reply, serial);
+        return;
+    }
+    if (call->msg){
+        dbus_message_set_reply_serial(call->msg, serial);
+    }
+}
+
 
 /*  Read functions      */
 

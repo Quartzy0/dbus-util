@@ -178,6 +178,10 @@ int dbus_util_send_error_reply(dbus_method_call *method_call, const char *error)
 
 void dbus_util_message_context_free(dbus_message_context *ctx);
 
+uint32_t dbus_util_get_serial(dbus_method_call *call);
+
+void dbus_util_set_reply_serial(dbus_method_call *call, uint32_t serial);
+
 
 /*          Read functions              */
 
