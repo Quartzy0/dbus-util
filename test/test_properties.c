@@ -112,6 +112,16 @@ test_prop_bool(dbus_bus *bus, dbus_message_context *ctx, void *param) {
 }
 
 void
+test_prop_str_cb(dbus_bus *bus, dbus_message_context *ctx, void *param) {
+    const char *s;
+    CHECKERR(dbus_util_message_context_enter_variant(&ctx, "s"));
+    CHECKERR(dbus_util_message_context_get_string(ctx, &s));
+    CHECKERR(dbus_util_message_context_exit_variant(&ctx));
+    CHECKERRN(!strcmp(s, "string, but callback"));
+    check_prop_count(bus, NULL, NULL);
+}
+
+void
 send_get_property_method(dbus_bus *bus, const char *name, dbus_util_method_reply_callback cb) {
     dbus_method_call *call = dbus_util_new_method_call("me.quartzy.dbusutil.testproperties", "/",
                                                        "org.freedesktop.DBus.Properties", "Get");
@@ -161,6 +171,7 @@ child_main() {
     send_get_property_method(bus, "Prop_str", test_prop_str);
     send_get_property_method(bus, "Prop_complex", test_prop_complex);
     send_get_property_method(bus, "Prop_bool", test_prop_bool);
+    send_get_property_method(bus, "Prop_str_cb", test_prop_str_cb);
 
     while (running) {
         dbus_util_poll_messages(bus);
@@ -209,6 +220,10 @@ void complex_property_set_cb(dbus_bus *bus, dbus_message_context *ctx, void *par
     com_obj = strdup(obj);
 }
 
+void Prop_str_cb(dbus_bus *bus, dbus_message_context *ctx, void *param) {
+    dbus_util_message_context_add_string_variant(ctx, "string, but callback");
+}
+
 int
 main() {
     running = true;
@@ -243,6 +258,7 @@ main() {
     dbus_util_set_property(interface, "Prop_str", "string property test");
     dbus_util_set_property_cb(interface, "Prop_complex", complex_property_get_cb, complex_property_set_cb, NULL);
     dbus_util_set_property_ptr(interface, "Prop_bool", &property_ptr);
+    dbus_util_set_property_cb(interface, "Prop_str_cb", Prop_str_cb, NULL, NULL);
 
     dbus_util_set_method_cb(interface, "AllRead", all_read_cb, NULL);
 

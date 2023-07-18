@@ -1160,11 +1160,6 @@ dbus_util_set_property_cb(dbus_interface *interface, const char *name, dbus_util
     struct dbus_property_t *p;
     int ret;
     if ((ret = dbus_util_add_new_property(interface, name, &p)))return ret;
-    if (p->type != 0 && !p->complex) {
-        fprintf(stderr, "Trying to set property '%s' to a complex type when it is already set as type %c\n", name,
-                p->type);
-        return DBUS_UTIL_INVALID_ARGUMENTS;
-    }
     if (!get_cb) {
         fprintf(stderr, "[dbus-util] The get callback was set to NULL for property '%s'\n", name);
     }
@@ -1173,6 +1168,7 @@ dbus_util_set_property_cb(dbus_interface *interface, const char *name, dbus_util
     }
     p->param = userp;
     p->changed = true;
+    p->complex = true;
     p->property_value.cb = get_cb;
     p->set_cb = set_cb;
 

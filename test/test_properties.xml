@@ -7,6 +7,7 @@
         <property name="Prop_str" type="s" access="readwrite"/>
         <property name="Prop_complex" type="(os)" access="readwrite"/>
         <property name="Prop_bool" type="b" access="read"/>
+        <property name="Prop_str_cb" type="s" access="read"/>
         <method name="AllRead"/>
     </interface>
 </node>
