@@ -182,6 +182,8 @@ uint32_t dbus_util_get_serial(dbus_method_call *call);
 
 void dbus_util_set_reply_serial(dbus_method_call *call, uint32_t serial);
 
+dbus_method_call *dbus_util_make_reply_call(dbus_method_call *call);
+
 
 /*          Read functions              */
 

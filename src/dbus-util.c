@@ -1316,6 +1316,15 @@ dbus_util_set_reply_serial(dbus_method_call *call, uint32_t serial) {
     }
 }
 
+dbus_method_call *
+dbus_util_make_reply_call(dbus_method_call *call){
+    if (!call) return NULL;
+    dbus_method_call *ret = malloc(sizeof(*ret));
+    memset(ret, 0, sizeof(*ret));
+    ret->msg = dbus_message_new_method_return(call->msg);
+    return ret;
+}
+
 
 /*  Read functions      */
 
