@@ -76,6 +76,11 @@ typedef void (*dbus_util_property_get_callback)(dbus_bus *bus, dbus_message_cont
 typedef void (*dbus_util_property_set_callback)(dbus_bus *bus, dbus_message_context *ctx, void *param);
 typedef void (*dbus_util_method_reply_callback)(dbus_bus *bus, dbus_message_context *ctx, void *param);
 
+typedef void* (*dbus_util_create_lock_callback)(void *param);
+typedef void (*dbus_util_lock_callback)(void *lock);
+typedef void (*dbus_util_unlock_callback)(void *lock);
+typedef void (*dbus_util_free_lock_callback)(void *lock);
+
 /*      Initialization functions        */
 
 int dbus_util_create_bus(dbus_bus **bus_out);
@@ -91,6 +96,8 @@ const char *dbus_util_get_error(dbus_bus *bus);
 dbus_interface *dbus_util_find_interface(const dbus_object *object, const char *name);
 
 int dbus_util_set_method_cb(dbus_interface *interface, const char *name, dbus_util_method_callback cb, void *param);
+
+void dbus_util_set_lock_cb(dbus_bus *bus, dbus_util_create_lock_callback create, dbus_util_lock_callback lock, dbus_util_unlock_callback unlock, dbus_util_free_lock_callback free, void *param);
 
 void dbus_util_poll_messages(dbus_bus *bus);
 

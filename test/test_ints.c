@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #define CHECKERR(x) do{int ret = (x);if(ret != 0){printf("Assert fail in %s:%d with %d\n", __FILE__, __LINE__, ret);dbus_util_free_bus(bus);exit(1);}}while(0)
 #define CHECKERRN(x) do{int ret = (x);if(ret == 0){printf("Assert fail in %s:%d with %d\n", __FILE__, __LINE__, ret);dbus_util_free_bus(bus);exit(1);}}while(0)

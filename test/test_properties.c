@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 #define CHECKERR(x) do{int ret = (x);if(ret != 0){printf("Assert fail in %s:%d with %d\n", __FILE__, __LINE__, ret);dbus_util_free_bus(bus);exit(1);}}while(0)
 #define CHECKERRN(x) do{int ret = (x);if(ret == 0){printf("Assert fail in %s:%d with %d\n", __FILE__, __LINE__, ret);dbus_util_free_bus(bus);exit(1);}}while(0)
@@ -224,6 +225,16 @@ void Prop_str_cb(dbus_bus *bus, dbus_message_context *ctx, void *param) {
     dbus_util_message_context_add_string_variant(ctx, "string, but callback");
 }
 
+void *init_lock(void *param){
+    pthread_mutex_t *mutex = malloc(sizeof(*mutex));
+    return mutex;
+}
+
+void free_lock(void *lock){
+    pthread_mutex_destroy(lock);
+    free(lock);
+}
+
 int
 main() {
     running = true;
@@ -239,6 +250,11 @@ main() {
 
     dbus_bus *bus;
     CHECKERR(dbus_util_create_bus_with_name(&bus, "me.quartzy.dbusutil.testproperties"));
+
+    dbus_util_set_lock_cb(bus, init_lock, (dbus_util_lock_callback) pthread_mutex_lock,
+                          (dbus_util_unlock_callback) pthread_mutex_unlock,
+                          free_lock, NULL);
+
     FILE *fp = fopen("test_properties.xml", "r");
     fseek(fp, 0, SEEK_END);
     size_t len = ftell(fp);

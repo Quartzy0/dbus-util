@@ -18,6 +18,15 @@
 static const char null_str[] = "(null)";
 static const char null_obj[] = "/null";
 
+struct dbus_lock_cb{
+    bool lock_set;
+    dbus_util_create_lock_callback create_lock;
+    dbus_util_lock_callback lock;
+    dbus_util_unlock_callback unlock;
+    dbus_util_free_lock_callback free;
+    void *param;
+};
+
 struct dbus_message_context_t {
     DBusMessageIter msg_iter;
     int container_type;
@@ -40,6 +49,7 @@ struct dbus_method_return_cb_t {
 
 struct dbus_interface_t {
     char *name;
+    struct dbus_lock_cb *lock_cb;
     struct dbus_method_t {
         char *name;
         dbus_util_method_callback cb;
@@ -56,6 +66,7 @@ struct dbus_interface_t {
         bool settable: 1;
         int type; // Not defined if complex is true
         void *param; // Only used if complex is true
+        void *lock; // Only used if not complex and not pointer
         dbus_util_property_set_callback set_cb; // Only used if complex and settable are true
         union {
             dbus_bool_t boolean;
@@ -82,6 +93,8 @@ struct dbus_object_t {
     dbus_interface *interfaces;
     size_t interfaces_len;
     size_t interfaces_size;
+
+    struct dbus_lock_cb *lock_cb;
 };
 
 struct dbus_bus_t {
@@ -97,6 +110,8 @@ struct dbus_bus_t {
     struct vec reply_vec;
 
     const char *introspection_data; // MUST BE NULL-TERMINATED
+
+    struct dbus_lock_cb lock_cb;
 
     enum dbus_util_error_code error;
     char *error_msg;
@@ -249,6 +264,7 @@ dbus_util_add_new_property(dbus_interface *interface, const char *name, struct d
     struct dbus_property_t *property = &interface->properties[interface->properties_len++];
     memset(property, 0, sizeof(*property));
     property->name = strdup(name);
+    if (interface->lock_cb->lock_set) property->lock = interface->lock_cb->create_lock(interface->lock_cb->param);
 
     *out = property;
 
@@ -331,6 +347,7 @@ dbus_util_free_bus(dbus_bus *bus) {
                      interface->properties[j].type == DBUS_TYPE_OBJECT_PATH)) {
                     free(interface->properties[j].property_value.str);
                 }
+                if (bus->lock_cb.lock_set && bus->lock_cb.free && interface->properties[j].lock) bus->lock_cb.free(interface->properties[j].lock);
             }
             free(interface->properties);
 
@@ -371,6 +388,7 @@ dbus_util_add_object(dbus_bus *bus, const char *name) {
     object->interfaces_size = 1;
     object->interfaces_len = 0;
     object->interfaces = malloc(object->interfaces_size * sizeof(*object->interfaces));
+    object->lock_cb = &bus->lock_cb;
 
     return object;
 }
@@ -406,6 +424,7 @@ dbus_util_add_interface(dbus_object *object, const char *name) {
     interface->properties_size = 1;
     interface->properties_len = 0;
     interface->properties = malloc(interface->properties_size * sizeof(*interface->properties));
+    interface->lock_cb = object->lock_cb;
 
     return &object->interfaces[object->interfaces_len - 1];
 }
@@ -443,6 +462,17 @@ dbus_util_set_method_cb(dbus_interface *interface, const char *name, dbus_util_m
     method->cb = cb;
     method->param = param;
     return DBUS_UTIL_SUCCESS;
+}
+
+void
+dbus_util_set_lock_cb(dbus_bus *bus, dbus_util_create_lock_callback create, dbus_util_lock_callback lock, dbus_util_unlock_callback unlock, dbus_util_free_lock_callback free, void *param){
+    if (!bus) return;
+
+    bus->lock_cb.create_lock = create;
+    bus->lock_cb.lock = lock;
+    bus->lock_cb.unlock = unlock;
+    bus->lock_cb.free = free;
+    bus->lock_cb.lock_set = true;
 }
 
 void
@@ -725,6 +755,11 @@ dbus_util_parse_introspection(dbus_bus *bus) {
         return DBUS_UTIL_INVALID_ARGUMENTS;
     }
 
+    dbus_object *obj = dbus_util_find_object(bus, "/");
+    if (!obj){
+        dbus_util_add_object(bus, "/");
+    }
+
     return DBUS_UTIL_SUCCESS;
 
     error:
@@ -995,8 +1030,10 @@ dbus_util_add_property_interface(dbus_object *object) {
                                     fprintf(stderr, "Trying to set property '%s' to a value when it is already a complex property\n", name);\
                                     return DBUS_UTIL_INVALID_ARGUMENTS;\
                                 }\
+                                if(interface->lock_cb->lock_set) interface->lock_cb->lock(p->lock);\
                                 p->changed = true;\
-                                p->property_value.v = val;\
+                                p->property_value.v = val;  \
+                                if(interface->lock_cb->lock_set) interface->lock_cb->unlock(p->lock);\
                                 return DBUS_UTIL_SUCCESS
 
 int
@@ -1062,9 +1099,11 @@ dbus_util_set_property_string(dbus_interface *interface, const char *name, const
         fprintf(stderr, "Trying to set property '%s' to a value when it is already a complex property\n", name);
         return DBUS_UTIL_INVALID_ARGUMENTS;
     }
+    if(interface->lock_cb->lock_set) interface->lock_cb->lock(p->lock);
     p->changed = true;
     free(p->property_value.str);
     p->property_value.str = strdup(val);
+    if(interface->lock_cb->lock_set) interface->lock_cb->unlock(p->lock);
 
     return DBUS_UTIL_SUCCESS;
 }

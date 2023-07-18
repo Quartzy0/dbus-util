@@ -11,7 +11,7 @@ target_link_libraries(dbus_util_test_containers PRIVATE dbus_util)
 add_test(NAME test_containers COMMAND dbus_util_test_containers)
 
 add_executable(dbus_util_test_properties test_properties.c)
-target_link_libraries(dbus_util_test_properties PRIVATE dbus_util)
+target_link_libraries(dbus_util_test_properties PRIVATE dbus_util pthread)
 add_test(NAME test_properties COMMAND dbus_util_test_properties)
 
 set_tests_properties(test_ints test_str test_containers test_properties PROPERTIES TIMEOUT 5 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
