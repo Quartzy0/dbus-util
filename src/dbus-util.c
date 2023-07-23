@@ -899,6 +899,8 @@ dbus_util_properties_get_all(dbus_bus *bus, dbus_object *object, dbus_interface 
     }
 
     dbus_util_message_context_exit_array(&ctx);
+
+    dbus_util_message_context_free(ctx);
 }
 
 void
