@@ -4,8 +4,13 @@ project(dbus_util C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+option(DBUS_UTIL_BUILD_SHARED "Build shared library instead of static" OFF)
 
-add_library(dbus_util src/dbus-util.c src/vec.c)
+if (DBUS_UTIL_BUILD_SHARED)
+    add_library(dbus_util SHARED src/dbus-util.c src/vec.c)
+else ()
+    add_library(dbus_util STATIC src/dbus-util.c src/vec.c)
+endif ()
 
 find_package(LibXml2 REQUIRED)
 find_package(DBUS REQUIRED)
