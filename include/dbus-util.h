@@ -210,6 +210,7 @@ dbus_message_context *dbus_util_make_reply_context(dbus_method_call *call);
 dbus_message_context *dbus_util_make_write_context(dbus_method_call *call);
 
 dbus_method_call *dbus_util_new_method_call(const char *destination, const char *path, const char *iface, const char *method);
+dbus_method_call *dbus_util_new_signal(const char *path, const char *iface, const char *name);
 void dbus_util_free_method_call(dbus_method_call *call);
 
 int dbus_util_send_method(dbus_bus *bus, dbus_method_call *call, dbus_util_method_reply_callback cb, void *param);

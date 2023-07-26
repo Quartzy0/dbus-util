@@ -1479,11 +1479,30 @@ dbus_util_new_method_call(const char *destination, const char *path, const char 
     return call;
 }
 
+dbus_method_call *
+dbus_util_new_signal(const char *path, const char *iface, const char *name){
+    if (!path || !iface || !name) return NULL;
+    dbus_method_call *call = malloc(sizeof(*call));
+    if (!call) {
+        perror("Error when calling malloc");
+        return NULL;
+    }
+    memset(call, 0, sizeof(*call));
+    call->msg = dbus_message_new_signal(path, iface, name);
+    if (!call->msg) {
+        fprintf(stderr, "[dbus-util] DBus ran out of memory!\n");
+        return NULL;
+    }
+
+    return call;
+}
+
 void
 dbus_util_free_method_call(dbus_method_call *call) {
     if (!call) return;
     if (call->reply) dbus_message_unref(call->reply);
     if (call->msg) dbus_message_unref(call->msg);
+    memset(call, 0, sizeof(*call));
     free(call);
 }
 
